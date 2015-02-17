@@ -86,11 +86,51 @@
 				 break;
 		 }
 	 }
+
+	 /*
+		* Called when the compass is updated
+		*/
+	 function onCompassUpdate(e)
+	 {
+		 var alpha;
+     // Check for iOS property
+     if( e.webkitCompassHeading ) {
+       alpha = event.webkitCompassHeading;
+       //Rotation is reversed for iOS
+     }
+     // non iOS
+     else {
+       alpha = event.alpha;
+		 }
+		 
+     var heading = alpha;
+     var res = document.getElementById("res");
+     //var comp = document.getElementById("compass");
+		 var comp = document.getElementById("canvas01");
+     if ( heading < 0 ) {
+			 heading += 360;
+		 }
+     heading += window.orientation;
+     //res.innerHTML = '方位 : ' + heading + '<br />精度 : ' + e.webkitCompassAccuracy;
+     //comp.style.webkitTransform = 'rotate(-'+(heading)+'deg)';
+	 }
+
 	 
 	 /*
 		* Called when loaded
 		*/
 	 window.addEventListener('load', function() {
+		 /* Get window size and update the canvas */
+     width = Window.getWindowSize().width;
+     height = Window.getWindowSize().height;
+		 $('canvas01').width = width;
+     $('canvas01').height = height;
+     $('canvas01').style.backgroundColor = 'black';
+
+		 /* Add event listener to the canvas */
+     $('canvas01').addEventListener('click', function(e){
+       alert("Clicked: " + e.clientX + " / " + e.clientY);
+		 }, false);
 
 		 var opts = {
 			 enableHighAccuracy: true,
@@ -129,40 +169,8 @@
 			 window.addEventListener('deviceorientation', onCompassUpdate, false);
 		 }
 
-     width = Window.getWindowSize().width;
-     height = Window.getWindowSize().height;
-		 $('canvas01').width = width;
-     $('canvas01').height = height;
-     $('canvas01').style.backgroundColor = 'black';
-
-     $('canvas01').addEventListener('click', function(e){
-       alert("Clicked: " + e.clientX + " / " + e.clientY);
-		 }, false);
-
 		 animation();
 	 }, false);
-
-	 function onCompassUpdate(e) {
-
-		 var alpha;
-     //Check for iOS property
-     if(e.webkitCompassHeading) {
-       alpha = event.webkitCompassHeading;
-       //Rotation is reversed for iOS
-     }
-     //non iOS
-     else {
-       alpha = event.alpha;
-		 }
-		 
-     var heading = alpha;
-     var res = document.getElementById("res");
-     var comp = document.getElementById("compass");
-     if (heading < 0) heading += 360;
-     heading += window.orientation;
-     res.innerHTML = '方位 : ' + heading + '<br />精度 : ' + e.webkitCompassAccuracy;
-     //comp.style.webkitTransform = 'rotate(-'+(heading)+'deg)';
-	 }
 
 	 function draw()
 	 {
