@@ -13,9 +13,12 @@
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
 	<script type="text/javascript">
+	 /* Timer */
 	 var _st = null;
+	 // Window width & height
 	 var width;
 	 var height;
+	 // Current coordinates
 	 var coords = null;
 
 	 /*
@@ -58,21 +61,41 @@
      return {'width': width, 'height': height};
 	 }
 	 Window.getWindowSize = _Window_getWindowSize;
-	 
 
+	 function onLocationUpdate(pos)
+	 {
+		 coords = pos.coords;
+	 }
+	 function onLocationUpdateError(error)
+	 {
+		 switch ( error.code ) {
+			 case error.POSITION_UNAVAILABLE:
+				 alert("Geolocation is unavailable");
+				 break;
+			 case error.PERMISSION_DENIED:
+							 alert("Geolocation: permission denied");
+				 break;
+			 case error.PERMISSION_DENIED_TIMEOUT:
+				 alert("Geolocation: timeout");
+				 break;
+		 }
+	 }
+	 
 	 /*
 		* Called when loaded
 		*/
-	 window.onload = function()
-	 {
+	 window.addEventListener('load', function() {
+		 var opts = {
+			 enableHighAccuracy: true,
+			 timeout: 5000,
+			 maximumAge: 0
+		 };
+		 navigator.geolocation.watchPosition(onLocationUpdate, onLocationUpdateError, opts);
+		 
 		 if (navigator.geolocation) {
 			 // Get current location
 			 navigator.geolocation.getCurrentPosition(
 				 function (pos) {
-					 //pos.timestamp;
-					 /*alert("got: Lat " + pos.coords.latitude + " Long " + pos.coords.longitude
-							+ " ("+pos.coords.accuracy+") "
-							+ " heading " + pos.coords.heading);*/
 					 coords = pos.coords;
 				 },
 				 function (error) {
@@ -92,10 +115,10 @@
 		 } else {
 			 alert("Geolocation API is not supported.");
 		 }
+		 /* Add event listener for compass */
 		 if ( window.DeviceOrientationEvent ) {
 			 window.addEventListener('deviceorientation', compassTest, false);
 		 }
-		 //draw();
 
      width = Window.getWindowSize().width;
      height = Window.getWindowSize().height;
@@ -108,7 +131,7 @@
 		 }, false);
 
 		 animation();
-	 }
+	 }, false);
 
 	 function compassTest(e) {
 
@@ -131,9 +154,6 @@
      res.innerHTML = '方位 : ' + heading + '<br />精度 : ' + e.webkitCompassAccuracy;
      //comp.style.webkitTransform = 'rotate(-'+(heading)+'deg)';
 	 }
-	 //window.addEventListener('load', function() {
-	 //    window.addEventListener('deviceorientation', compassTest, false);
-	 //}, false);
 
 	 function draw()
 	 {
