@@ -21,6 +21,24 @@
 	 // Current coordinates
 	 var coords = null;
 
+	 var lamf = function(res) {
+     var restext = res.responseText;
+     var jsonobj = null;
+     if ( JSON && JSON.parse ) {
+       jsonobj = JSON.parse(restext)
+     } else {
+       jsonobj = eval('('+restext+')');
+     }
+		 
+     if ( jsonobj.error == "0" ) {
+       // No error found
+       linetypes = jsonobj.data;
+     } else {
+       // Error
+       alert("An error occurred. Please reload the page. E1");
+     }
+   }
+
 	 /*
 		* Function to get an element by ID
 		*/
