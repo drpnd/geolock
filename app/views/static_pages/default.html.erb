@@ -13,6 +13,25 @@
  var points = new Array();
  var found = new Array();
 
+ function deg2str(deg)
+ {
+	 var a;
+	 var b;
+	 var c;
+	 var str;
+	 
+	 a = deg;
+	 if ( deg > 0 ) {
+		 b = (a - parseInt(a)) * 60;
+	 } else {
+		 b = (parseInt(a) - a) * 60;
+	 }
+	 c = (b - parseInt(b)) * 60;
+	 str = parseInt(a)+"°"+parseInt(b)+"'"+parseInt(c)+"''";
+
+	 return str;
+ }
+ 
  function updatePoints()
  {
 	 var lamf = function(res) {
@@ -43,10 +62,10 @@
 	 for ( var k in points ) {
 		 var lat = coords.latitude - points[k].latitude;
 		 var long = coords.longitude - points[k].longitude;
-		 /* about 1km */
-		 if ( lat < 0.0001 && lat > -0.0001
-			 && long < 0.0001 && long > -0.0001 ) {
-				 if ( found.indexOf(points[k].id) < 0 ) {
+		 /* about 50m */
+		 if ( lat < 0.0005 && lat > -0.0005
+			 && long < 0.0005 && long > -0.0005 ) {
+				 if ( found.indexOf(points[k].id.toString()) < 0 ) {
 					 alert("Get " + points[k].name + "!");
 					 found.push(points[k].id);
 					 localStorage.setItem("found", found.join());
@@ -114,7 +133,7 @@
 
 			 if ( (cx + lat * radius - 20 < x && cx + lat * radius + 20 > x)
 					 && (cy + long * radius - 20 < y && cy + long * radius + 20 > y) ) {
-						 alert(points[k].description);
+						 alert(points[k].description + "\n @ " + deg2str(points[k].longitude) + " / " + deg2str(points[k].latitude));
 			 }
 		 }
 	 }
@@ -294,7 +313,7 @@
 			 /* about 1km */
 			 if ( lat < 0.01 && lat > -0.01
 				 && long < 0.01 && long > -0.01 ) {
-					 if ( found.indexOf(points[k].id) < 0 ) {
+					 if ( found.indexOf(points[k].id.toString()) < 0 ) {
 						 ctx.beginPath();
 						 ctx.arc(cx + lat * radius, cy + long * radius, savedr,0,Math.PI*2,true);
 						 ctx.closePath();
@@ -314,7 +333,7 @@
 				 /* about 1km */
 				 if ( lat < 0.01 && lat > -0.01
 					 && long < 0.01 && long > -0.01 ) {
-						 if ( found.indexOf(points[k].id) < 0 ) {
+						 if ( found.indexOf(points[k].id.toString()) < 0 ) {
 							 ctx.fillStyle="rgba(255,255,255,1.0)";
 							 ctx.font="8pt Verdana";
 							 ctx.fillText(points[k].name, cx + lat * radius + 10, cy + long * radius + 10);
@@ -325,9 +344,9 @@
 		 }
 
 		 ctx.fillStyle="rgba(255,0,0,1.0)";
-		 ctx.font="8pt Verdana";
+		 ctx.font="9pt Verdana";
 		 ctx.fillText(numpoints + " spots", width - 100, height - 60);
-		 ctx.fillText("in 1 km", width - 100, height - 50);
+		 ctx.fillText("     in 1 km", width - 100, height - 45);
 	 }
 
 	 /* Schedule next frame shot */
