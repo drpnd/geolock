@@ -62,10 +62,16 @@
 	 }
 	 Window.getWindowSize = _Window_getWindowSize;
 
+	 /*
+		* Called when the location is updated
+		*/
 	 function onLocationUpdate(pos)
 	 {
 		 coords = pos.coords;
 	 }
+	 /*
+		* Called when the location update is failed
+		*/
 	 function onLocationUpdateError(error)
 	 {
 		 switch ( error.code ) {
@@ -85,6 +91,8 @@
 		* Called when loaded
 		*/
 	 window.addEventListener('load', function() {
+
+		 /* Add event lister for geolocation */
 		 var opts = {
 			 enableHighAccuracy: true,
 			 timeout: 5000,
@@ -92,32 +100,9 @@
 		 };
 		 navigator.geolocation.watchPosition(onLocationUpdate, onLocationUpdateError, opts);
 		 
-		 if (navigator.geolocation) {
-			 // Get current location
-			 navigator.geolocation.getCurrentPosition(
-				 function (pos) {
-					 coords = pos.coords;
-				 },
-				 function (error) {
-					 switch ( error.code ) {
-						 case error.POSITION_UNAVAILABLE:
-							 alert("Geolocation is unavailable");
-							 break;
-						 case error.PERMISSION_DENIED:
-							 alert("Geolocation: permission denied");
-							 break;
-						 case error.PERMISSION_DENIED_TIMEOUT:
-							 alert("Geolocation: timeout");
-							 break;
-					 }
-				 }
-			 );
-		 } else {
-			 alert("Geolocation API is not supported.");
-		 }
 		 /* Add event listener for compass */
 		 if ( window.DeviceOrientationEvent ) {
-			 window.addEventListener('deviceorientation', compassTest, false);
+			 window.addEventListener('deviceorientation', onCompassUpdate, false);
 		 }
 
      width = Window.getWindowSize().width;
@@ -133,7 +118,7 @@
 		 animation();
 	 }, false);
 
-	 function compassTest(e) {
+	 function onCompassUpdate(e) {
 
 		 var alpha;
      //Check for iOS property
