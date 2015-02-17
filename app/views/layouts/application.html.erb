@@ -92,13 +92,37 @@
 		*/
 	 window.addEventListener('load', function() {
 
-		 /* Add event lister for geolocation */
 		 var opts = {
 			 enableHighAccuracy: true,
 			 timeout: 5000,
 			 maximumAge: 0
 		 };
-		 navigator.geolocation.watchPosition(onLocationUpdate, onLocationUpdateError, opts);
+     if ( navigator.geolocation ) {
+			 /* Add event lister for geolocation */
+			 navigator.geolocation.watchPosition(onLocationUpdate, onLocationUpdateError, opts);
+
+			 /* Update once */
+       navigator.geolocation.getCurrentPosition(
+         function (pos) {
+           coords = pos.coords;
+         },
+         function (error) {
+           switch ( error.code ) {
+             case error.POSITION_UNAVAILABLE:
+               alert("Geolocation is unavailable");
+               break;
+             case error.PERMISSION_DENIED:
+               alert("Geolocation: permission denied");
+               break;
+             case error.PERMISSION_DENIED_TIMEOUT:
+               alert("Geolocation: timeout");
+               break;
+           }
+         }
+       );
+     } else {
+       alert("Geolocation API is not supported.");
+     }
 		 
 		 /* Add event listener for compass */
 		 if ( window.DeviceOrientationEvent ) {
