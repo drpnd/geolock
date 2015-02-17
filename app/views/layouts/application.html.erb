@@ -13,282 +13,109 @@
   <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
   <%= csrf_meta_tags %>
 	<script type="text/javascript">
-	 /* Timer */
-	 var _st = null;
-	 // Window width & height
-	 var width;
-	 var height;
-	 // Current coordinates
-	 var coords = null;
-
-	 var lamf = function(res) {
-     var restext = res.responseText;
-     var jsonobj = null;
-     if ( JSON && JSON.parse ) {
-       jsonobj = JSON.parse(restext)
-     } else {
-       jsonobj = eval('('+restext+')');
-     }
-		 
-     if ( jsonobj.error == "0" ) {
-       // No error found
-       linetypes = jsonobj.data;
-     } else {
-       // Error
-       alert("An error occurred. Please reload the page. E1");
-     }
-   }
-
 	 /*
 		* Function to get an element by ID
 		*/
 	 function $(element)
 	 {
-     if ( typeof element == 'string' ) {
-       if ( document.getElementById ) {
-         element = document.getElementById(element);
-       } else if ( document.all ) {
-         element = document.all(element);
-       } else if ( document.layers ) {
-         element = document.layers[element];
-       } else {
-         element = null;
-       }
-     }
-     return element;
+		 if ( typeof element == 'string' ) {
+			 if ( document.getElementById ) {
+				 element = document.getElementById(element);
+			 } else if ( document.all ) {
+				 element = document.all(element);
+			 } else if ( document.layers ) {
+				 element = document.layers[element];
+			 } else {
+				 element = null;
+			 }
+		 }
+		 return element;
 	 }
 	 /*
 		* Function to get the window size
 		*/
 	 function _Window_getWindowSize(value)
 	 {
-     var width;
-     var height;
+		 var width;
+		 var height;
 
-     if ( document.all ) {
-       width = document.documentElement.clientWidth;
-       height = document.documentElement.clientHeight;
-     } else if ( document.layers || document.getElementById ) {
-       width = window.innerWidth;
-       height = window.innerHeight;
-     } else {
-       width = 0;
-       height = 0;
-     }
+		 if ( document.all ) {
+			 width = document.documentElement.clientWidth;
+			 height = document.documentElement.clientHeight;
+		 } else if ( document.layers || document.getElementById ) {
+			 width = window.innerWidth;
+			 height = window.innerHeight;
+		 } else {
+			 width = 0;
+			 height = 0;
+		 }
 
-     return {'width': width, 'height': height};
+		 return {'width': width, 'height': height};
 	 }
 	 Window.getWindowSize = _Window_getWindowSize;
 
 	 /*
-		* Called when the location is updated
+		* Ajax
 		*/
-	 function onLocationUpdate(pos)
-	 {
-		 coords = pos.coords;
-	 }
-	 /*
-		* Called when the location update is failed
-		*/
-	 function onLocationUpdateError(error)
-	 {
-		 switch ( error.code ) {
-			 case error.POSITION_UNAVAILABLE:
-				 alert("Geolocation is unavailable");
-				 break;
-			 case error.PERMISSION_DENIED:
-							 alert("Geolocation: permission denied");
-				 break;
-			 case error.PERMISSION_DENIED_TIMEOUT:
-				 alert("Geolocation: timeout");
-				 break;
-		 }
-	 }
+	 function Ajax()
+	 {}
 
 	 /*
-		* Called when the compass is updated
+		* createHttpRequest
 		*/
-	 function onCompassUpdate(e)
+	 function _Ajax_createHttpRequest()
 	 {
-		 var alpha;
-     // Check for iOS property
-     if( e.webkitCompassHeading ) {
-       alpha = event.webkitCompassHeading;
-       //Rotation is reversed for iOS
-     }
-     // non iOS
-     else {
-       alpha = event.alpha;
-		 }
-		 
-     var heading = alpha;
-     var res = document.getElementById("res");
-     //var comp = document.getElementById("compass");
-		 var comp = document.getElementById("canvas01");
-     if ( heading < 0 ) {
-			 heading += 360;
-		 }
-     heading += window.orientation;
-     //res.innerHTML = '方位 : ' + heading + '<br />精度 : ' + e.webkitCompassAccuracy;
-     //comp.style.webkitTransform = 'rotate(-'+(heading)+'deg)';
-	 }
-
-	 
-	 /*
-		* Called when loaded
-		*/
-	 window.addEventListener('load', function() {
-		 /* Get window size and update the canvas */
-     width = Window.getWindowSize().width;
-     height = Window.getWindowSize().height;
-		 $('canvas01').width = width;
-     $('canvas01').height = height;
-     $('canvas01').style.backgroundColor = 'black';
-
-		 /* Add event listener to the canvas */
-     $('canvas01').addEventListener('click', function(e){
-       alert("Clicked: " + e.clientX + " / " + e.clientY);
-		 }, false);
-
-		 var opts = {
-			 enableHighAccuracy: true,
-			 timeout: 5000,
-			 maximumAge: 0
-		 };
-     if ( navigator.geolocation ) {
-			 /* Add event lister for geolocation */
-			 navigator.geolocation.watchPosition(onLocationUpdate, onLocationUpdateError, opts);
-
-			 /* Update once */
-       navigator.geolocation.getCurrentPosition(
-         function (pos) {
-           coords = pos.coords;
-         },
-         function (error) {
-           switch ( error.code ) {
-             case error.POSITION_UNAVAILABLE:
-               alert("Geolocation is unavailable");
-               break;
-             case error.PERMISSION_DENIED:
-               alert("Geolocation: permission denied");
-               break;
-             case error.PERMISSION_DENIED_TIMEOUT:
-               alert("Geolocation: timeout");
-               break;
-           }
+     if (window.ActiveXObject) {
+       try {
+         return new ActiveXObject("Msxml2.XMLHTTP");
+       } catch (e) {
+         try {
+           return new ActiveXObject("Microsoft.XMLHTTP");
+         } catch (e2) {
+           return null;
          }
-       );
+       }
+     } else if (window.XMLHttpRequest) {
+       return new XMLHttpRequest();
      } else {
-       alert("Geolocation API is not supported.");
+       return null;
      }
-		 
-		 /* Add event listener for compass */
-		 if ( window.DeviceOrientationEvent ) {
-			 window.addEventListener('deviceorientation', onCompassUpdate, false);
-		 }
-
-		 animation();
-	 }, false);
-
-	 function draw()
-	 {
-		 var cx = width / 2;
-		 var cy = height / 2;
-		 var radius = cx > cy ? cy : cx;
-
-		 var ctx = $('canvas01').getContext("2d");
-
-		 // Circles
-		 ctx.strokeStyle="rgba(0,255,0,0.7)";
-		 ctx.lineWidth = 1;
-		 var i;
-		 for ( i = 0; i <= 10; i++ ) {
-			 ctx.beginPath();
-			 ctx.arc(cx,cy,radius * 0.1 * i,0,Math.PI*2,true);
-			 ctx.closePath();
-			 ctx.stroke();
-		 }
-
-		 ctx.strokeStyle="rgba(0,255,0,0.6)";
-		 ctx.lineWidth = 1;
-		 for ( i = 0; i < 12; i++ ) {
-			 
-			 ctx.beginPath();
-			 ctx.moveTo(cx, cy);
-			 ctx.lineTo(cx + radius * Math.cos(Math.PI / 6 * i),
-									cy + radius * Math.sin(Math.PI / 6 * i));
-			 ctx.closePath();
-			 ctx.stroke();
-		 }
-
-		 // Text
-		 ctx.fillStyle="rgba(0,255,0,1.0)";
-		 //ctx.font="10pt Monaco";
-		 ctx.font="10pt Verdana";
-		 if ( coords ) {
-			 var a;
-			 var b;
-			 var c;
-			 var str = "";
-
-			 a = coords.longitude;
-			 if ( coords.longitude > 0 ) {
-				 b = (a - parseInt(a)) * 60;
-			 } else {
-				 b = (parseInt(a) - a) * 60;
-			 }
-			 c = (b - parseInt(b)) * 60;
-			 str += parseInt(a)+"°"+parseInt(b)+"'"+parseInt(c)+"''";
-			 str += "/";
-			 a = coords.latitude;
-			 if ( coords.latitude > 0 ) {
-				 b = (a - parseInt(a)) * 60;
-			 } else {
-				 b = (parseInt(a) - a) * 60;
-			 }
-			 c = (b - parseInt(b)) * 60;
-			 str += parseInt(a)+"°"+parseInt(b)+"'"+parseInt(c)+"''";
-			 //coords.latitude + " / " + coords.longitude
-			 ctx.fillText(str,cx,cy);
-		 }
 	 }
+	 Ajax.prototype.createHttpRequest = _Ajax_createHttpRequest;
+	 Ajax.createHttpRequest = _Ajax_createHttpRequest;
 
-	 var savedr = 0;
-	 function animation()
+	 /*
+		* request
+		*/
+	 function _Ajax_request( callback , data , method , fileURL , async )
 	 {
-		 var ctx = $('canvas01').getContext("2d");
-		 savedr = savedr % 20;
-		 savedr += 2;
-		 if ( savedr == 2 ) {
-			 ctx.clearRect(0, 0, width, height);
-			 draw();
-		 }
+     var oj = this.createHttpRequest();
+     if( oj == null ) return null;
 
-		 ctx.strokeStyle="rgba(255,0,0,0.2)";
-		 ctx.fillStyle="rgba(255,0,0,0.1)";
-		 ctx.lineWidth = 3;
-
-		 ctx.beginPath();
-		 ctx.arc(width * 0.2, height * 0.1, savedr,0,Math.PI*2,true);
-		 ctx.closePath();
-		 ctx.stroke();
-		 ctx.fill();
-
-		 ctx.beginPath();
-		 ctx.arc(width * 0.8, height * 0.4, savedr,0,Math.PI*2,true);
-		 ctx.closePath();
-		 ctx.stroke();
-		 ctx.fill();
-
-		 if ( savedr == 2 ) {
-			 ctx.fillStyle="rgba(255,0,0,1.0)";
-			 ctx.font="8pt Verdana";
-			 ctx.fillText("3 other spots",width - 100,height - 60);
-			 ctx.fillText("in 5 miles",width - 100,height - 50);
-		 }
-
-		 _st = setTimeout("animation()", 50);
+     var ua = navigator.userAgent;
+     var safari    = ua.indexOf("Safari")!=-1;
+     var konqueror = ua.indexOf("Konqueror")!=-1;
+     var mozes     = ((a=navigator.userAgent.split("Gecko/")[1] )?a.split(" ")[0]:0) >= 20011128 ;
+     if (window.opera || safari || mozes) {
+       oj.onload = function () { callback(oj) }
+     } else {
+       oj.onreadystatechange = function () {
+         if ( oj.readyState == 4 ) {
+           callback(oj)
+         }
+       }
+     }
+     // open メソッド
+     oj.open( method , fileURL , async );
+     if (method == 'POST') {
+       oj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+     }
+     // send メソッド
+     oj.send(data)
 	 }
+	 Ajax.prototype.request = _Ajax_request;
+	 Ajax.request = _Ajax_request;
+
 	</script>
 </head>
 <body style="background-color: black;color:lime;margin:0;padding:0;">

@@ -26,47 +26,6 @@
  }
 
  /*
-	* Function to get an element by ID
-	*/
- function $(element)
- {
-   if ( typeof element == 'string' ) {
-     if ( document.getElementById ) {
-       element = document.getElementById(element);
-     } else if ( document.all ) {
-       element = document.all(element);
-     } else if ( document.layers ) {
-       element = document.layers[element];
-     } else {
-       element = null;
-     }
-   }
-   return element;
- }
- /*
-	* Function to get the window size
-	*/
- function _Window_getWindowSize(value)
- {
-   var width;
-   var height;
-
-   if ( document.all ) {
-     width = document.documentElement.clientWidth;
-     height = document.documentElement.clientHeight;
-   } else if ( document.layers || document.getElementById ) {
-     width = window.innerWidth;
-     height = window.innerHeight;
-   } else {
-     width = 0;
-     height = 0;
-   }
-
-   return {'width': width, 'height': height};
- }
- Window.getWindowSize = _Window_getWindowSize;
-
- /*
 	* Called when the location is updated
 	*/
  function onLocationUpdate(pos)
