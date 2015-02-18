@@ -115,7 +115,7 @@
    if ( heading < 0 ) {
 		 heading += 360;
 	 }
-   //heading += window.orientation;
+   heading += window.orientation;
    //res.innerHTML = '方位 : ' + heading + '<br />精度 : ' + e.webkitCompassAccuracy;
    comp.style.webkitTransform = 'rotate(-'+(heading)+'deg)';
  }
