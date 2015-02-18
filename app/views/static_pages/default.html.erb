@@ -172,9 +172,8 @@
 	 /* Get window size and update the canvas */
    width = Window.getWindowSize().width;
    height = Window.getWindowSize().height;
-	 var radius = cx > cy ? cy : cx;
-	 $('canvas01').width = radius;
-   $('canvas01').height = radius;
+	 $('canvas01').width = width;
+   $('canvas01').height = height;
    //$('canvas01').style.backgroundColor = 'black';
 
 	 $('canvas02').width = width;
