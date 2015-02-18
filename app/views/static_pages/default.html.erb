@@ -67,7 +67,7 @@
 			 && long < 0.0005 && long > -0.0005 ) {
 				 if ( found.indexOf(points[k].id.toString()) < 0 ) {
 					 alert("Get " + points[k].name + "!");
-					 found.push(points[k].id);
+					 found.push(points[k].id.toString());
 					 localStorage.setItem("found", found.join());
 				 }
 		 }
