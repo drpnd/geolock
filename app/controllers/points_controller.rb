@@ -9,6 +9,12 @@ class PointsController < ApplicationController
     end
   end
 
+  def test
+    logger.info params[:x]
+    @points = Point.all
+    render json: @points
+  end
+
   # GET /points
   # GET /points.json
   def index

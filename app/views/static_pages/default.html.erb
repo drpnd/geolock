@@ -101,11 +101,13 @@
    // Check for iOS property
    if( e.webkitCompassHeading ) {
      alpha = event.webkitCompassHeading;
+		 alpha = alpha - 90;
+		 alpha = - alpha;
      //Rotation is reversed for iOS
    }
    // non iOS
    else {
-     alpha = - event.alpha;
+     alpha = event.alpha;
 	 }
 	 
    var heading = alpha;
@@ -115,9 +117,9 @@
    if ( heading < 0 ) {
 		 heading += 360;
 	 }
-   heading += window.orientation;
-   //res.innerHTML = '方位 : ' + heading + '<br />精度 : ' + e.webkitCompassAccuracy;
-   comp.style.webkitTransform = 'rotate(-'+(heading)+'deg)';
+   //heading += window.screen.orientation;
+   res.innerHTML = '方位 : ' + heading + '<br />精度 : ' + e.webkitCompassAccuracy;
+   comp.style.webkitTransform = 'rotate('+(heading)+'deg)';
  }
 
  function onClickCanvas(x, y)
@@ -250,6 +252,11 @@
 	 ctx.strokeStyle="rgba(0,255,0,0.6)";
 	 ctx.lineWidth = 1;
 	 for ( i = 0; i < 12; i++ ) {
+		 if ( i == 9 ) {
+			 ctx.strokeStyle="rgba(255,0,0,0.6)";
+		 } else {
+			 ctx.strokeStyle="rgba(0,255,0,0.6)";
+		 }
 		 
 		 ctx.beginPath();
 		 ctx.moveTo(cx, cy);
@@ -367,4 +374,4 @@
 </script>
 <canvas id="canvas02" width="100" height="600" style="margin:0;padding:0;position:absolute;left0;top:0;"></canvas>
 <canvas id="canvas01" width="100" height="600" style="margin:0;padding:0;position:absolute;left0;top:0;"></canvas>
-<!-- <div id="res"></div>-->
+<div id="res" style="margin:0;padding:0;position:absolute;left0;top:0;"></div>

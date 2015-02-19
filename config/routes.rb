@@ -1,5 +1,13 @@
 Rails.application.routes.draw do
-  resources :points
+  resources :points do
+    collection do
+      get 'test/:x/:y' => 'points#test', :as => 'points',
+      constraints: {
+	x: /\d/,
+	y: /\d/
+      }
+    end
+  end
 
   # The priority is based upon order of creation: first created -> highest priority.
   # See how all your routes lay out with "rake routes".
