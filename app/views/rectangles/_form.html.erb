@@ -1,0 +1,37 @@
+<%= form_for(@rectangle) do |f| %>
+  <% if @rectangle.errors.any? %>
+    <div id="error_explanation">
+      <h2><%= pluralize(@rectangle.errors.count, "error") %> prohibited this rectangle from being saved:</h2>
+
+      <ul>
+      <% @rectangle.errors.full_messages.each do |message| %>
+        <li><%= message %></li>
+      <% end %>
+      </ul>
+    </div>
+  <% end %>
+
+  <div class="field">
+    <%= f.label :name %><br>
+    <%= f.text_field :name %>
+  </div>
+  <div class="field">
+    <%= f.label :latitude0 %><br>
+    <%= f.text_field :latitude0 %>
+  </div>
+  <div class="field">
+    <%= f.label :longitude0 %><br>
+    <%= f.text_field :longitude0 %>
+  </div>
+  <div class="field">
+    <%= f.label :latitude1 %><br>
+    <%= f.text_field :latitude1 %>
+  </div>
+  <div class="field">
+    <%= f.label :longitude1 %><br>
+    <%= f.text_field :longitude1 %>
+  </div>
+  <div class="actions">
+    <%= f.submit %>
+  </div>
+<% end %>

@@ -1,0 +1,29 @@
+<p id="notice"><%= notice %></p>
+
+<p>
+  <strong>Name:</strong>
+  <%= @rectangle.name %>
+</p>
+
+<p>
+  <strong>Latitude0:</strong>
+  <%= @rectangle.latitude0 %>
+</p>
+
+<p>
+  <strong>Longitude0:</strong>
+  <%= @rectangle.longitude0 %>
+</p>
+
+<p>
+  <strong>Latitude1:</strong>
+  <%= @rectangle.latitude1 %>
+</p>
+
+<p>
+  <strong>Longitude1:</strong>
+  <%= @rectangle.longitude1 %>
+</p>
+
+<%= link_to 'Edit', edit_rectangle_path(@rectangle) %> |
+<%= link_to 'Back', rectangles_path %>

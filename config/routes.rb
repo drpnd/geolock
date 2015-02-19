@@ -1,10 +1,12 @@
 Rails.application.routes.draw do
+  resources :rectangles
+
   resources :points do
     collection do
       get 'test/:x/:y' => 'points#test', :as => 'points',
       constraints: {
-	x: /\d/,
-	y: /\d/
+	x: /\-?\d+\.\d+/,
+	y: /\-?\d+\.\d+/
       }
     end
   end
