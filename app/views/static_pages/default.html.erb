@@ -1,4 +1,12 @@
 <script type="text/javascript">
+
+ /* Options for the GeoLocation API */
+ var geoopts = {
+	 enableHighAccuracy: true,
+	 timeout: 5000,
+	 maximumAge: 0
+ };
+
  /* Timer */
  var _st = null;
  // Window width & height
@@ -13,8 +21,10 @@
  var points = new Array();
  var found = new Array();
 
- function deg2str(deg)
- {
+ /*
+	* Convert degree in a float value to a printable string format
+	*/
+ function deg2str(deg) {
 	 var a;
 	 var b;
 	 var c;
@@ -48,15 +58,15 @@
 		 }
 	 }
 	 var req = '{}'+"\n";
-   ajax.request(lamf, req, 'GET', "./points.json", false);
+   ajax.request(lamf, req, 'GET', "./points.json");
  }
 
  /*
-	* Called when the location is updated
+	* EventHandler: Called when the location is updated
 	*/
- function onLocationUpdate(pos)
+ function onLocationUpdate(loc)
  {
-	 coords = pos.coords;
+	 coords = loc.coords;
 
 	 // Check within 10m
 	 for ( var k in points ) {
@@ -74,8 +84,9 @@
 	 }
 
  }
+
  /*
-	* Called when the location update is failed
+	* EventHandler: Called when the location update is failed
 	*/
  function onLocationUpdateError(error)
  {
@@ -93,7 +104,7 @@
  }
 
  /*
-	* Called when the compass is updated
+	* EventHandler: Called when the compass is updated
 	*/
  function onCompassUpdate(e)
  {
@@ -118,10 +129,15 @@
 		 heading += 360;
 	 }
    //heading += window.screen.orientation;
-   res.innerHTML = '方位 : ' + heading + '<br />精度 : ' + e.webkitCompassAccuracy;
+   res.innerHTML = 'Heading : ' + heading
+								 + '<br />Accuracy : ' + e.webkitCompassAccuracy;
    comp.style.webkitTransform = 'rotate('+(heading)+'deg)';
  }
 
+ /*
+	* EventHandler: Called when the canvas is clicked
+	* The callee reports the clicked position in the x and y arguments.
+	*/
  function onClickCanvas(x, y)
  {
 	 var cx = width / 2;
@@ -146,13 +162,13 @@
  }
  
  /*
-	* Called when loaded
+	* EventHandler: Called when loaded
 	*/
  window.addEventListener('load', function() {
 	 /* Update points */
 	 updatePoints();
 
-	 /* Storage */
+	 /* Read the stored point data from the local storage using storage API */
 	 if ( typeof(Storage) !== "undefined" ) {
 		 var jsonobj;
 		 var str = localStorage.getItem("points");
@@ -168,7 +184,7 @@
 			 found = str.split(",")
 		 }
 	 } else {
-		 alert("Sorry, no Storage support found.");
+		 alert("Sorry, Storage API is not supported.");
 	 }
 
 	 /* Get window size and update the canvas */
@@ -187,19 +203,15 @@
      onClickCanvas(e.clientX, e.clientY);
 	 }, false);
 
-	 var opts = {
-		 enableHighAccuracy: true,
-		 timeout: 5000,
-		 maximumAge: 0
-	 };
    if ( navigator.geolocation ) {
 		 /* Add event lister for geolocation */
-		 navigator.geolocation.watchPosition(onLocationUpdate, onLocationUpdateError, opts);
+		 navigator.geolocation.watchPosition(onLocationUpdate, onLocationUpdateError,
+																				 geoopts);
 
-		 /* Update once */
+		 /* Get the current location */
      navigator.geolocation.getCurrentPosition(
-       function (pos) {
-         coords = pos.coords;
+       function (loca) {
+         coords = loca.coords;
        },
        function (error) {
          switch ( error.code ) {
@@ -219,11 +231,12 @@
      alert("Geolocation API is not supported.");
    }
 	 
-	 /* Add event listener for compass */
+	 /* Add event listener for compass (to watch the orientation changes) */
 	 if ( window.DeviceOrientationEvent ) {
 		 window.addEventListener('deviceorientation', onCompassUpdate, false);
 	 }
 
+	 /* Finally, start the animation */
 	 animation();
  }, false);
 
@@ -372,6 +385,9 @@
 	 _st = setTimeout("animation()", 50);
  }
 </script>
-<canvas id="canvas02" width="100" height="600" style="margin:0;padding:0;position:absolute;left0;top:0;"></canvas>
-<canvas id="canvas01" width="100" height="600" style="margin:0;padding:0;position:absolute;left0;top:0;"></canvas>
-<div id="res" style="margin:0;padding:0;position:absolute;left0;top:0;"></div>
+<!-- Canvas -->
+<canvas class="radar" id="canvas02" width="100" height="600"></canvas>
+<canvas class="radar" id="canvas01" width="100" height="600"></canvas>
+
+<!-- Information box -->
+<div class="infobox" id="res"></div>

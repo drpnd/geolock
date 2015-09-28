@@ -1,126 +1,126 @@
 <!DOCTYPE html>
 <html>
-<head>
-  <title>Geolock</title>
-	<meta charset="UTF-8" />
-	<meta name="Author" content="Hirochika Asai" />
-	<meta name="Copyright" content="(C) 2013-2014 Hirochika Asai.  All rights reserved." />
-	<!--<meta name="viewport" content="initial-scale=1.0" />-->
-	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;" />
-	<meta name="apple-mobile-web-app-capable" content="yes" />
-	<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
-  <%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
-  <%= csrf_meta_tags %>
-	<script type="text/javascript">
-	 /*
-		* Function to get an element by ID
-		*/
-	 function $(element)
-	 {
-		 if ( typeof element == 'string' ) {
-			 if ( document.getElementById ) {
-				 element = document.getElementById(element);
-			 } else if ( document.all ) {
-				 element = document.all(element);
-			 } else if ( document.layers ) {
-				 element = document.layers[element];
+	<head>
+		<title>Geolock</title>
+		<meta charset="UTF-8" />
+		<meta name="Author" content="Hirochika Asai" />
+		<meta name="Copyright" content="(C) 2013-2015 Hirochika Asai.  All rights reserved." />
+		<!--<meta name="viewport" content="initial-scale=1.0" />-->
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0" />
+		<meta name="apple-mobile-web-app-capable" content="yes" />
+		<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+		<%= stylesheet_link_tag    'application', media: 'all', 'data-turbolinks-track' => true %>
+		<%= javascript_include_tag 'application', 'data-turbolinks-track' => true %>
+		<%= csrf_meta_tags %>
+		<script type="text/javascript">
+		 /*
+			* Function to get an element by ID
+			*/
+		 function $(element)
+		 {
+			 if ( typeof element == 'string' ) {
+				 if ( document.getElementById ) {
+					 element = document.getElementById(element);
+				 } else if ( document.all ) {
+					 element = document.all(element);
+				 } else if ( document.layers ) {
+					 element = document.layers[element];
+				 } else {
+					 element = null;
+				 }
+			 }
+			 return element;
+		 }
+		 /*
+			* Function to get the window size
+			*/
+		 function _Window_getWindowSize(value)
+		 {
+			 var width;
+			 var height;
+
+			 if ( document.all ) {
+				 width = document.documentElement.clientWidth;
+				 height = document.documentElement.clientHeight;
+			 } else if ( document.layers || document.getElementById ) {
+				 width = window.innerWidth;
+				 height = window.innerHeight;
 			 } else {
-				 element = null;
+				 width = 0;
+				 height = 0;
+			 }
+
+			 return {'width': width, 'height': height};
+		 }
+		 Window.getWindowSize = _Window_getWindowSize;
+
+		 /*
+			* Ajax
+			*/
+		 function Ajax()
+		 {}
+
+		 /*
+			* createHttpRequest
+			*/
+		 function _Ajax_createHttpRequest()
+		 {
+			 if (window.ActiveXObject) {
+				 try {
+					 return new ActiveXObject("Msxml2.XMLHTTP");
+				 } catch (e) {
+					 try {
+						 return new ActiveXObject("Microsoft.XMLHTTP");
+					 } catch (e2) {
+						 return null;
+					 }
+				 }
+			 } else if (window.XMLHttpRequest) {
+				 return new XMLHttpRequest();
+			 } else {
+				 return null;
 			 }
 		 }
-		 return element;
-	 }
-	 /*
-		* Function to get the window size
-		*/
-	 function _Window_getWindowSize(value)
-	 {
-		 var width;
-		 var height;
+		 Ajax.prototype.createHttpRequest = _Ajax_createHttpRequest;
+		 Ajax.createHttpRequest = _Ajax_createHttpRequest;
 
-		 if ( document.all ) {
-			 width = document.documentElement.clientWidth;
-			 height = document.documentElement.clientHeight;
-		 } else if ( document.layers || document.getElementById ) {
-			 width = window.innerWidth;
-			 height = window.innerHeight;
-		 } else {
-			 width = 0;
-			 height = 0;
+		 /*
+			* Ajax.Request
+			*/
+		 function _Ajax_request(callback, data, method, fileURL)
+		 {
+			 var oj = this.createHttpRequest();
+			 if( oj == null ) return null;
+
+			 var ua = navigator.userAgent;
+			 var safari    = ua.indexOf("Safari")!=-1;
+			 var konqueror = ua.indexOf("Konqueror")!=-1;
+			 var mozes     = ((a=navigator.userAgent.split("Gecko/")[1] )?a.split(" ")[0]:0) >= 20011128 ;
+			 if (window.opera || safari || mozes) {
+				 oj.onload = function () { callback(oj) }
+			 } else {
+				 oj.onreadystatechange = function () {
+					 if ( oj.readyState == 4 ) {
+						 callback(oj)
+					 }
+				 }
+			 }
+			 // open
+			 oj.open(method, fileURL, true);
+			 if (method == 'POST') {
+				 oj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
+			 }
+			 // send
+			 oj.send(data)
 		 }
+		 Ajax.prototype.request = _Ajax_request;
+		 Ajax.request = _Ajax_request;
 
-		 return {'width': width, 'height': height};
-	 }
-	 Window.getWindowSize = _Window_getWindowSize;
+		</script>
+	</head>
+	<body>
 
-	 /*
-		* Ajax
-		*/
-	 function Ajax()
-	 {}
+		<%= yield %>
 
-	 /*
-		* createHttpRequest
-		*/
-	 function _Ajax_createHttpRequest()
-	 {
-     if (window.ActiveXObject) {
-       try {
-         return new ActiveXObject("Msxml2.XMLHTTP");
-       } catch (e) {
-         try {
-           return new ActiveXObject("Microsoft.XMLHTTP");
-         } catch (e2) {
-           return null;
-         }
-       }
-     } else if (window.XMLHttpRequest) {
-       return new XMLHttpRequest();
-     } else {
-       return null;
-     }
-	 }
-	 Ajax.prototype.createHttpRequest = _Ajax_createHttpRequest;
-	 Ajax.createHttpRequest = _Ajax_createHttpRequest;
-
-	 /*
-		* request
-		*/
-	 function _Ajax_request( callback , data , method , fileURL , async )
-	 {
-     var oj = this.createHttpRequest();
-     if( oj == null ) return null;
-
-     var ua = navigator.userAgent;
-     var safari    = ua.indexOf("Safari")!=-1;
-     var konqueror = ua.indexOf("Konqueror")!=-1;
-     var mozes     = ((a=navigator.userAgent.split("Gecko/")[1] )?a.split(" ")[0]:0) >= 20011128 ;
-     if (window.opera || safari || mozes) {
-       oj.onload = function () { callback(oj) }
-     } else {
-       oj.onreadystatechange = function () {
-         if ( oj.readyState == 4 ) {
-           callback(oj)
-         }
-       }
-     }
-     // open
-     oj.open( method , fileURL , async );
-     if (method == 'POST') {
-       oj.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded')
-     }
-     // send
-     oj.send(data)
-	 }
-	 Ajax.prototype.request = _Ajax_request;
-	 Ajax.request = _Ajax_request;
-
-	</script>
-</head>
-<body style="background-color: black;color:lime;margin:0;padding:0;">
-
-<%= yield %>
-
-</body>
+	</body>
 </html>

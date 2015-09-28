@@ -13,3 +13,40 @@
  *= require_tree .
  *= require_self
  */
+body {
+		background-color: black;
+		background-color: black;
+		color: white; /*lime*/
+		margin:0;
+		padding:0;
+}
+a {
+		color: #ccccff;
+		text-decoration: underline;
+}
+a:visited {
+		color: #ccccff;
+		text-decoration: underline;
+}
+a:hover {
+		background-color: #333333;
+		text-decoration: underline;
+}
+a img {
+		border: none;
+}
+
+canvas.radar {
+		margin: 0;
+		padding: 0;
+		position: absolute;
+		left: 0;
+		top: 0;
+}
+div.infobox {
+		margin: 0;
+		padding: 0;
+		position: absolute;
+		left: 0;
+		top: 0;
+}
