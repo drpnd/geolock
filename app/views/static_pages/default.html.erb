@@ -220,8 +220,8 @@
 
 		 /* Get the current location */
      navigator.geolocation.getCurrentPosition(
-       function (loca) {
-         coords = loca.coords;
+       function (loc) {
+         coords = loc.coords;
        },
        function (error) {
          switch ( error.code ) {
