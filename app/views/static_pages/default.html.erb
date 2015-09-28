@@ -134,15 +134,13 @@
 	 
    var heading = alpha;
    var res = document.getElementById("res");
-   //var comp = document.getElementById("compass");
 	 var comp = document.getElementById("canvas01");
    if ( heading < 0 ) {
 		 heading += 360;
 	 }
-   //heading += window.screen.orientation;
    res.innerHTML = 'Heading : ' + heading
 								 + '<br />Accuracy : ' + e.webkitCompassAccuracy;
-   comp.style.webkitTransform = 'rotate('+(heading)+'deg)';
+   //comp.style.webkitTransform = 'rotate('+(heading)+'deg)';
  }
 
  /*
