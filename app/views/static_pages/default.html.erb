@@ -7,6 +7,11 @@
 	 maximumAge: 0
  };
 
+ var text_color = "rgba(0,255,0,1.0)";
+ var text_font = "12pt Verdana";
+ var radar_color = "rgba(0,255,0,0.6)";
+ var radar_color_north = "rgba(255,0,0,0.6)"; 
+
  /* Timer */
  var _st = null;
  // Window width & height
@@ -41,7 +46,10 @@
 
 	 return str;
  }
- 
+
+ /*
+	* Update points
+	*/
  function updatePoints()
  {
 	 var lamf = function(res) {
@@ -135,7 +143,7 @@
  }
 
  /*
-	* EventHandler: Called when the canvas is clicked
+	* EventHandler: Called when a node in the canvas is clicked
 	* The callee reports the clicked position in the x and y arguments.
 	*/
  function onClickCanvas(x, y)
@@ -185,6 +193,7 @@
 		 }
 	 } else {
 		 alert("Sorry, Storage API is not supported.");
+		 return;
 	 }
 
 	 /* Get window size and update the canvas */
@@ -229,6 +238,7 @@
      );
    } else {
      alert("Geolocation API is not supported.");
+		 return false;
    }
 	 
 	 /* Add event listener for compass (to watch the orientation changes) */
@@ -245,15 +255,18 @@
 	*/
  function draw()
  {
+	 /* Center of the screen */
 	 var cx = width / 2;
 	 var cy = height / 2;
+	 /* Calculate the maximum radius fitting to the screen */
 	 var radius = cx > cy ? cy : cx;
 
+	 /* Get the context of the radar canvas */
 	 var ctx = $('canvas01').getContext("2d");
 
-	 // Circles
-	 ctx.strokeStyle="rgba(0,255,0,0.7)";
-	 ctx.lineWidth = 1;
+	 // Draw 10 circles
+	 ctx.strokeStyle = radar_color;
+	 ctx.lineWidth = 2;
 	 var i;
 	 for ( i = 0; i <= 10; i++ ) {
 		 ctx.beginPath();
@@ -262,15 +275,17 @@
 		 ctx.stroke();
 	 }
 
-	 ctx.strokeStyle="rgba(0,255,0,0.6)";
+	 /* Draw 12 radial lines */
+	 ctx.strokeStyle = radar_color;
 	 ctx.lineWidth = 1;
 	 for ( i = 0; i < 12; i++ ) {
 		 if ( i == 9 ) {
-			 ctx.strokeStyle="rgba(255,0,0,0.6)";
+			 /* North */
+			 ctx.strokeStyle = radar_color_north;
 		 } else {
-			 ctx.strokeStyle="rgba(0,255,0,0.6)";
-		 }
-		 
+			 /* Other */
+			 ctx.strokeStyle = radar_color;
+		 }		 
 		 ctx.beginPath();
 		 ctx.moveTo(cx, cy);
 		 ctx.lineTo(cx + radius * Math.cos(Math.PI / 6 * i),
@@ -279,36 +294,14 @@
 		 ctx.stroke();
 	 }
 
+	 /* Get the context of textual canvas */
 	 var ctx = $('canvas02').getContext("2d");
 	 // Text
-	 ctx.fillStyle="rgba(0,255,0,1.0)";
-	 //ctx.font="10pt Monaco";
-	 ctx.font="10pt Verdana";
+	 ctx.fillStyle = text_color;
+	 ctx.font = text_font;
 	 if ( coords ) {
-		 var a;
-		 var b;
-		 var c;
-		 var str = "";
-
-		 a = coords.longitude;
-		 if ( coords.longitude > 0 ) {
-			 b = (a - parseInt(a)) * 60;
-		 } else {
-			 b = (parseInt(a) - a) * 60;
-		 }
-		 c = (b - parseInt(b)) * 60;
-		 str += parseInt(a)+"°"+parseInt(b)+"'"+parseInt(c)+"''";
-		 str += "/";
-		 a = coords.latitude;
-		 if ( coords.latitude > 0 ) {
-			 b = (a - parseInt(a)) * 60;
-		 } else {
-			 b = (parseInt(a) - a) * 60;
-		 }
-		 c = (b - parseInt(b)) * 60;
-		 str += parseInt(a)+"°"+parseInt(b)+"'"+parseInt(c)+"''";
-		 //coords.latitude + " / " + coords.longitude
-		 ctx.fillText(str,cx,cy);
+		 var str = deg2str(coords.longitude) + "/" + deg2str(coords.latitude);
+		 ctx.fillText(str, cx, cy);
 	 }
  }
 
@@ -318,16 +311,22 @@
  var savedr = 0;
  function animation()
  {
+	 /* Background */
 	 var ctx = $('canvas01').getContext("2d");
+	 /* Text information */
 	 var ctx2 = $('canvas02').getContext("2d");
+
+	 /* Increase the saved radius (and loop) */
 	 savedr = savedr % 20;
 	 savedr += 2;
 	 if ( savedr == 2 ) {
+		 /* Periodically refresh (clear) the background */
 		 ctx.clearRect(0, 0, width, height);
 		 ctx2.clearRect(0, 0, width, height);
 		 draw();
 	 }
 
+	 /* Red beacon */
 	 ctx.strokeStyle="rgba(255,0,0,0.2)";
 	 ctx.fillStyle="rgba(255,0,0,0.1)";
 	 ctx.lineWidth = 3;
@@ -336,21 +335,19 @@
 	 var cy = height / 2;
 	 var radius = cx > cy ? cy : cx;
 	 var numpoints = 0;
-
 	 if ( coords ) {
 		 for ( var k in points ) {
 			 var lat = coords.latitude - points[k].latitude;
 			 var long = coords.longitude - points[k].longitude;
 			 /* about 1km */
-			 if ( lat < 0.01 && lat > -0.01
-				 && long < 0.01 && long > -0.01 ) {
-					 if ( found.indexOf(points[k].id.toString()) < 0 ) {
-						 ctx.beginPath();
-						 ctx.arc(cx + lat * radius * 100, cy + long * radius * 100, savedr,0,Math.PI*2,true);
-						 ctx.closePath();
-						 ctx.stroke();
-						 ctx.fill();
-					 }
+			 if ( lat < 0.01 && lat > -0.01 && long < 0.01 && long > -0.01 ) {
+				 if ( found.indexOf(points[k].id.toString()) < 0 ) {
+					 ctx.beginPath();
+					 ctx.arc(cx + lat * radius * 100, cy + long * radius * 100, savedr,0,Math.PI*2,true);
+					 ctx.closePath();
+					 ctx.stroke();
+					 ctx.fill();
+				 }
 			 }
 		 }
 	 }
@@ -366,7 +363,7 @@
 					 && long < 0.01 && long > -0.01 ) {
 						 if ( found.indexOf(points[k].id.toString()) < 0 ) {
 							 ctx.fillStyle="rgba(255,255,255,1.0)";
-							 ctx.font="8pt Verdana";
+							 ctx.font="12pt Verdana";
 							 ctx.fillText(points[k].name, cx + lat * radius * 100 + 10, cy + long * radius * 100 + 10);
 							 numpoints++;
 						 }
@@ -374,9 +371,11 @@
 			 }
 		 }
 
+
+		 /* Add the informational text */
 		 var ctx = $('canvas02').getContext("2d");
 		 ctx.fillStyle="rgba(255,0,0,1.0)";
-		 ctx.font="9pt Verdana";
+		 ctx.font = "12pt Verdana";
 		 ctx.fillText(numpoints + " spots", width - 100, height - 60);
 		 ctx.fillText("     in 1 km", width - 100, height - 45);
 	 }
