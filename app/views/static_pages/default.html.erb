@@ -26,6 +26,9 @@
  var points = new Array();
  var found = new Array();
 
+ // For animation
+ var savedr = 0;
+
  /*
 	* Convert degree in a float value to a printable string format
 	*/
@@ -173,7 +176,7 @@
 	* EventHandler: Called when loaded
 	*/
  window.addEventListener('load', function() {
-	 /* Update points */
+	 /* Request to update points */
 	 updatePoints();
 
 	 /* Read the stored point data from the local storage using storage API */
@@ -201,8 +204,6 @@
    height = Window.getWindowSize().height;
 	 $('canvas01').width = width;
    $('canvas01').height = height;
-   //$('canvas01').style.backgroundColor = 'black';
-
 	 $('canvas02').width = width;
    $('canvas02').height = height;
    $('canvas02').style.backgroundColor = 'black';
@@ -253,7 +254,7 @@
  /*
   * Draw the canvas
 	*/
- function draw()
+ function drawShot()
  {
 	 /* Center of the screen */
 	 var cx = width / 2;
@@ -308,7 +309,6 @@
  /*
 	* Animation
 	*/
- var savedr = 0;
  function animation()
  {
 	 /* Background */
@@ -323,7 +323,32 @@
 		 /* Periodically refresh (clear) the background */
 		 ctx.clearRect(0, 0, width, height);
 		 ctx2.clearRect(0, 0, width, height);
-		 draw();
+		 drawShot();
+
+		 var numpoints = 0;
+		 if ( coords ) {
+			 for ( var k in points ) {
+				 var lat = coords.latitude - points[k].latitude;
+				 var long = coords.longitude - points[k].longitude;
+				 /* about 1km */
+				 if ( lat < 0.01 && lat > -0.01
+					 && long < 0.01 && long > -0.01 ) {
+						 if ( found.indexOf(points[k].id.toString()) < 0 ) {
+							 ctx.fillStyle="rgba(255,255,255,1.0)";
+							 ctx.font="11pt Verdana";
+							 ctx.fillText(points[k].name, cx + lat * radius * 100 + 10, cy + long * radius * 100 + 10);
+							 numpoints++;
+						 }
+				 }
+			 }
+		 }
+
+		 /* Add the informational text */
+		 var ctx = $('canvas02').getContext("2d");
+		 ctx.fillStyle="rgba(255,0,0,1.0)";
+		 ctx.font = "12pt Verdana";
+		 ctx.fillText(numpoints + " spots", width - 100, height - 60);
+		 ctx.fillText("     in 1 km", width - 100, height - 45);
 	 }
 
 	 /* Red beacon */
@@ -350,34 +375,6 @@
 				 }
 			 }
 		 }
-	 }
-
-	 if ( savedr == 2 ) {
-		 var numpoints = 0;
-		 if ( coords ) {
-			 for ( var k in points ) {
-				 var lat = coords.latitude - points[k].latitude;
-				 var long = coords.longitude - points[k].longitude;
-				 /* about 1km */
-				 if ( lat < 0.01 && lat > -0.01
-					 && long < 0.01 && long > -0.01 ) {
-						 if ( found.indexOf(points[k].id.toString()) < 0 ) {
-							 ctx.fillStyle="rgba(255,255,255,1.0)";
-							 ctx.font="11pt Verdana";
-							 ctx.fillText(points[k].name, cx + lat * radius * 100 + 10, cy + long * radius * 100 + 10);
-							 numpoints++;
-						 }
-				 }
-			 }
-		 }
-
-
-		 /* Add the informational text */
-		 var ctx = $('canvas02').getContext("2d");
-		 ctx.fillStyle="rgba(255,0,0,1.0)";
-		 ctx.font = "12pt Verdana";
-		 ctx.fillText(numpoints + " spots", width - 100, height - 60);
-		 ctx.fillText("     in 1 km", width - 100, height - 45);
 	 }
 
 	 /* Schedule next frame shot */
