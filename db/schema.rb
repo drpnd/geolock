@@ -11,7 +11,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 20150217152426) do
+ActiveRecord::Schema.define(version: 20150219130107) do
 
   create_table "points", force: :cascade do |t|
     t.string   "name",        limit: 255
@@ -20,6 +20,16 @@ ActiveRecord::Schema.define(version: 20150217152426) do
     t.float    "longitude",   limit: 24
     t.datetime "created_at",              null: false
     t.datetime "updated_at",              null: false
+  end
+
+  create_table "rectangles", force: :cascade do |t|
+    t.string   "name",       limit: 255
+    t.float    "latitude0",  limit: 24
+    t.float    "longitude0", limit: 24
+    t.float    "latitude1",  limit: 24
+    t.float    "longitude1", limit: 24
+    t.datetime "created_at",             null: false
+    t.datetime "updated_at",             null: false
   end
 
 end
